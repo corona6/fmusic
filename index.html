@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="apple-touch-icon" href="./icons/icon_180.png">
+    <link rel="icon" type="image/png" href="./icons/icon_64.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>fmusic</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background-image: url("fmusic.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .player-container {
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            width: 100%;
+            max-width: 25rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: .3rem;
+            padding-top: 0.75rem;
+        }
+
+        .timer-button {
+            width: 2.2rem;
+            border: .75px #000 solid;
+            border-radius: 30rem;
+            padding: .5em;
+            cursor: pointer;
+            background: none;
+        }
+
+        .timer-text {
+            width: 5rem;
+            padding: .5em;
+            text-align: center;
+        }
+
+        audio::-webkit-media-controls-current-time-display,
+        audio::-webkit-media-controls-time-remaining-display {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="player-container">
+        <div class="controls">
+            <audio controls loop controlsList="nodownload noplaybackrate"
+                src="081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3"></audio>
+        </div>
+        <div class="timer">
+            <button id="timer-i-btn" class="timer-button">
+                ∞
+            </button>
+            <button id="timer-5-btn" class="timer-button">
+                +5
+            </button>
+            <button id="timer-15-btn" class="timer-button">
+                +15
+            </button>
+            <div id="timer-text" class="timer-text">
+                ∞
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('./sw.js', { scope: './' })
+                .then((registration) => {
+                    registration.update()
+                })
+        };
+
+        let isTimer = false;
+        let timeoutID;
+        let timer1;
+        let timerM = 0;
+        const timerIBtn = document.getElementById('timer-i-btn');
+        const timer5Btn = document.getElementById('timer-5-btn');
+        const timer15Btn = document.getElementById('timer-15-btn');
+        const timerText = document.getElementById('timer-text');
+        const audioElement = document.querySelector("audio");
+
+        audioElement.onplay = (event) => {
+            if (isTimer) {
+                if (timerM <= 0) {
+                    isTimer = false;
+                    timerText.textContent = "∞";
+                    clearInterval(timer1);
+                    clearTimeout(timeoutID);
+                } else {
+                    clearInterval(timer1);
+                    clearTimeout(timeoutID);
+                    timeoutID = setTimeout(stop, (timerM + 0.1) * 1000);
+                    timer1 = setInterval(updateTimer, 1000);
+                }
+            }
+        };
+
+        audioElement.onpause = (event) => {
+            if (isTimer) {
+                clearInterval(timer1);
+                clearTimeout(timeoutID);
+            }
+        };
+
+        timerIBtn.onclick = () => {
+            isTimer = false;
+            timerText.textContent = "∞";
+            timerM = 0;
+            clearInterval(timer1);
+            clearTimeout(timeoutID);
+        };
+
+        timer5Btn.onclick = () => {
+            isTimer = true;
+            timerM += 5 * 60;
+            timerText.textContent = toTime(timerM);
+            if (!audioElement.paused) {
+                clearInterval(timer1);
+                clearTimeout(timeoutID);
+                timeoutID = setTimeout(stop, (timerM + 0.1) * 1000);
+                timer1 = setInterval(updateTimer, 1000);
+            }
+        };
+
+        timer15Btn.onclick = () => {
+            isTimer = true;
+            timerM += 15 * 60;
+            timerText.textContent = toTime(timerM);
+            if (!audioElement.paused) {
+                clearInterval(timer1);
+                clearTimeout(timeoutID);
+                timeoutID = setTimeout(stop, (timerM + 0.1) * 1000);
+                timer1 = setInterval(updateTimer, 1000);
+            }
+        };
+
+        function updateTimer() {
+            if (timerM > 0) timerM -= 1;
+            if (timerM <= 0) clearInterval(timer1);
+            timerText.textContent = toTime(timerM);
+        }
+
+        function toTime(seconds) {
+            if (seconds <= 0) return "00:00:00";
+            var date = new Date(null);
+            date.setSeconds(seconds);
+            return date.toISOString().substr(11, 8);
+        }
+
+        function stop() {
+            audioElement.pause();
+            if (isTimer) {
+                clearInterval(timer1);
+                clearTimeout(timeoutID);
+            }
+        }
+    </script>
+</body>
+
+</html>
