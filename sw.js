@@ -52,17 +52,15 @@ self.addEventListener("activate", (event) => {
     event.waitUntil(deleteOldCaches());
 });
 
-self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            if (response) {
-                return response;
-            }
-            return fetch(event.request).then(function(response) {
-                return response;
-            }).catch(function(error) {
-                throw error;
-            });
-        })
-    );
-});
+self.addEventListener('fetch', (e) => {
+    e.respondWith(async function () {
+        const cachedResponse = await caches.match(e.request.url)
+        if (cachedResponse) {
+            // cache hit
+            return cachedResponse
+        } else {
+            // fallback to fetch
+            return fetch(e.request)
+        }
+    }())
+})
