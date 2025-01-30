@@ -71,6 +71,15 @@
         audio::-webkit-media-controls-time-remaining-display {
             display: none;
         }
+
+        #download-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            border: .75px #000 solid;
+            border-radius: 30rem;
+            padding: .5em;
+        }
     </style>
 </head>
 
@@ -78,8 +87,11 @@
     <div class="player-container">
         <div class="controls">
             <audio controls loop controlsList="nodownload noplaybackrate noremoteplayback"
-                src="081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3"></audio>
+                src="./081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3"></audio>
         </div>
+        <button id="download-btn">
+            download
+        </button>
         <div class="timer">
             <button id="timer-i-btn" class="timer-button">
                 ∞
@@ -114,6 +126,7 @@
         const timer15Btn = document.getElementById('timer-15-btn');
         const timerText = document.getElementById('timer-text');
         const audioElement = document.querySelector("audio");
+        const downloadBtn = document.getElementById('download-btn');
 
         audioElement.onplay = (event) => {
             if (isTimer) {
@@ -168,6 +181,15 @@
                 timeoutID = setTimeout(stop, (timerM + 0.1) * 1000);
                 timer1 = setInterval(updateTimer, 1000);
             }
+        };
+
+        downloadBtn.onclick = () => {
+            navigator.serviceWorker.ready.then(async (swReg) => {
+                const bgFetch = await swReg.backgroundFetch.fetch('my-fetch', ['./081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3'], {
+                    title: 'fmusic',
+                    downloadTotal: 24219340,
+                });
+            });
         };
 
         function updateTimer() {
