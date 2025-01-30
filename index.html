@@ -186,8 +186,7 @@
         downloadBtn.onclick = () => {
             navigator.serviceWorker.ready.then(async (swReg) => {
                 const bgFetch = await swReg.backgroundFetch.fetch('my-fetch', ['./081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3'], {
-                    title: 'fmusic',
-                    downloadTotal: 24219340,
+                    title: 'fmusic'
                 });
             });
         };
