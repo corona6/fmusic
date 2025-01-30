@@ -1,5 +1,5 @@
 
-const MAIN_CACHE = 'main_20250131_5';
+const MAIN_CACHE = 'main_20250131_6';
 
 self.addEventListener("install", async (event) => {
     event.waitUntil((async () => {
@@ -53,16 +53,44 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener('fetch', function(event) {
-    event.respondWith(
-        caches.match(event.request).then(function(response) {
-            if (response) {
-                return response;
-            }
-            return fetch(event.request).then(function(response) {
-                return response;
-            }).catch(function(error) {
-                throw error;
-            });
-        })
-    );
+    if (event.request.headers.get('range')) {
+        var pos =
+        Number(/^bytes\=(\d+)\-$/g.exec(event.request.headers.get('range'))[1]);
+        event.respondWith(
+            caches.open(MAIN_CACHE)
+            .then(function(cache) {
+                return cache.match(event.request.url);
+            }).then(function(res) {
+                if (!res) {
+                    return fetch(event.request)
+                    .then(res => {
+                        return res.arrayBuffer();
+                    });
+                }
+                return res.arrayBuffer();
+            }).then(function(ab) {
+                return new Response(
+                ab.slice(pos),
+                {
+                    status: 206,
+                    statusText: 'Partial Content',
+                    headers: [
+                    ['Content-Range', 'bytes ' + pos + '-' +
+                        (ab.byteLength - 1) + '/' + ab.byteLength]]
+                });
+        }));
+    } else {
+        event.respondWith(
+            caches.match(event.request).then(function(response) {
+                if (response) {
+                    return response;
+                }
+                return fetch(event.request).then(function(response) {
+                    return response;
+                }).catch(function(error) {
+                    throw error;
+                });
+            })
+        );
+    }
 });
