@@ -24,9 +24,23 @@
             align-items: center;
             justify-content: center;
             padding: 1rem;
-            background-image: url("fmusic.jpg");
+            /* background-image: url("fmusic.jpg");
             background-position: center;
             background-repeat: no-repeat;
+            background-size: cover; */
+            transition: filter .75s cubic-bezier(0.12, 0, 0.39, 0);
+        }
+
+        body::after {
+            content: '';
+            z-index: -1;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background: url("fmusic.jpg") no-repeat;
+            background-position: center;
             background-size: cover;
         }
 
@@ -44,6 +58,15 @@
             display: flex;
             justify-content: center;
             gap: 1rem;
+        }
+
+        #next-btn {
+            cursor: pointer;
+            background: none;
+            width: 4rem;
+            font-weight: bold;
+            border: 2.75px #000 solid;
+            border-radius: 30rem;
         }
 
         .timer {
@@ -80,6 +103,9 @@
         <div class="controls">
             <audio controls loop controlsList="nodownload noplaybackrate noremoteplayback"
                 src="./081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3"></audio>
+            <button id="next-btn">
+                focus
+            </button>
         </div>
         <div class="timer">
             <button id="timer-i-btn" class="timer-button">
@@ -107,14 +133,36 @@
         };
 
         let isTimer = false;
+        let isFocus = true;
         let timeoutID;
         let timer1;
         let timerM = 0;
+        const nextBtn = document.getElementById('next-btn');
         const timerIBtn = document.getElementById('timer-i-btn');
         const timer5Btn = document.getElementById('timer-5-btn');
         const timer15Btn = document.getElementById('timer-15-btn');
         const timerText = document.getElementById('timer-text');
         const audioElement = document.querySelector("audio");
+
+        function updateNextButton() {
+            nextBtn.innerHTML = isFocus
+                ? `focus`
+                : `relax`;
+            document.body.style.filter = isFocus
+                ? "hue-rotate(0)"
+                : "hue-rotate(80deg)";
+        }
+
+        nextBtn.onclick = () => {
+            isFocus = !isFocus;
+            audioElement.src = isFocus
+                ? "081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3" : "e382c0be-90e8-489c-8aa1-e61518ce971f.mp3";
+            if (isTimer) {
+                clearInterval(timer1);
+                clearTimeout(timeoutID);
+            }
+            updateNextButton();
+        };
 
         audioElement.onplay = (event) => {
             if (isTimer) {
