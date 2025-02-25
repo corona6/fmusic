@@ -95,6 +95,112 @@
         audio::-webkit-media-controls-time-remaining-display {
             display: none;
         }
+
+        .overlay-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 2.2rem;
+            border: .75px #000 solid;
+            border-radius: 30rem;
+            padding: .65em;
+            cursor: pointer;
+            background: none;
+            z-index: 2;
+            display: grid;
+            place-items: center;
+        }
+
+        .overlay-button.on {
+            color: #8EA6BB;
+            border: .75px #8EA6BB solid;
+        }
+
+        .overlay {
+            height: 100%;
+            width: 100%;
+            display: none;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: rgb(0, 0, 0);
+        }
+
+        #box-breathing-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #box-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        #box {
+            width: calc(min(50vmin, 250px));
+            height: calc(min(50vmin, 250px));
+            border: 2px solid #8EA6BB;
+        }
+
+        #dot {
+            width: 1.2rem;
+            height: 1.2rem;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            border: 2px solid #8EA6BB;
+            border-radius: 400rem;
+            background: #000000;
+            animation: dot-animation 16s infinite cubic-bezier(0.2, 0, 0.8, 1);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.7em;
+
+            font-family: monospace;
+            font-weight: 800;
+            color: #ffff;
+
+            left: calc(0% + 2px/2);
+            top: calc(100% - 2px/2);
+        }
+
+        @keyframes dot-animation {
+            0% {
+                left: calc(100% - 2px/2);
+                top: calc(100% - 2px/2);
+                background-position: 100% 50%;
+            }
+
+            25% {
+                left: calc(0% + 2px/2);
+                top: calc(100% - 2px/2);
+                background-position: 100% 50%;
+            }
+
+            50% {
+                left: calc(0% + 2px/2);
+                top: calc(0% + 2px/2);
+                background-position: 0% 0%;
+            }
+
+            75% {
+                left: calc(100% - 2px/2);
+                top: calc(0% + 2px/2);
+                background-position: 0% 0%;
+            }
+
+            100% {
+                left: calc(100% - 2px/2);
+                top: calc(100% - 2px/2);
+                background-position: 100% 50%;
+            }
+        }
     </style>
 </head>
 
@@ -123,6 +229,22 @@
         </div>
     </div>
 
+    <div id="boxb" class="overlay">
+        <div id="box-breathing-container">
+            <div id="box-container">
+                <div id="box"></div>
+                <div id="dot"></div>
+            </div>
+        </div>
+    </div>
+    <button id="overlayb" class="overlay-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square"
+            viewBox="0 0 16 16">
+            <path
+                d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
+        </svg>
+    </button>
+
     <script>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker
@@ -134,15 +256,18 @@
 
         let isTimer = false;
         let isFocus = true;
+        let isOverlay = false;
         let timeoutID;
         let timer1;
         let timerM = 0;
+        let wakeLock = null;
         const nextBtn = document.getElementById('next-btn');
         const timerIBtn = document.getElementById('timer-i-btn');
         const timer5Btn = document.getElementById('timer-5-btn');
         const timer15Btn = document.getElementById('timer-15-btn');
         const timerText = document.getElementById('timer-text');
         const audioElement = document.querySelector("audio");
+        const overlayb = document.getElementById('overlayb');
 
         function updateNextButton() {
             nextBtn.innerHTML = isFocus
@@ -216,6 +341,38 @@
                 clearTimeout(timeoutID);
                 timeoutID = setTimeout(stop, (timerM + 0.1) * 1000);
                 timer1 = setInterval(updateTimer, 1000);
+            }
+        };
+
+        overlayb.onclick = () => {
+            isOverlay = !isOverlay;
+            if (isOverlay) {
+                overlayb.classList.add("on");
+                document.getElementById("boxb").style.display = "block";
+                overlayb.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+  <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+</svg>`;
+                const requestWakeLock = async () => {
+                    try {
+                        wakeLock = await navigator.wakeLock.request('screen');
+                    } catch (err) {
+                    }
+                };
+                requestWakeLock();
+                window.setTimeout(() => {
+                    wakeLock.release().then(() => {
+                        wakeLock = null;
+                    });
+                }, 1000 * 60 * 16);
+            } else {
+                overlayb.classList.remove("on");
+                document.getElementById("boxb").style.display = "none";
+                overlayb.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-square" viewBox="0 0 16 16">
+  <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
+</svg>`;
+                wakeLock.release().then(() => {
+                    wakeLock = null;
+                });
             }
         };
 
