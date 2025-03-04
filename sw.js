@@ -1,5 +1,5 @@
 
-const MAIN_CACHE = 'main_20250304';
+const MAIN_CACHE = 'main_20250304_2';
 
 self.addEventListener("install", async (event) => {
     event.waitUntil((async () => {
