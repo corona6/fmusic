@@ -1,5 +1,5 @@
 
-const MAIN_CACHE = 'main_20250309';
+const MAIN_CACHE = 'main_20250311';
 
 self.addEventListener("install", async (event) => {
     event.waitUntil((async () => {
@@ -10,9 +10,10 @@ self.addEventListener("install", async (event) => {
             './index.html',
             './manifest.webmanifest',
             './fmusic.jpg',
-            './081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3',
+            // './081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3',
+            './17c6eaa2-e8a0-4dbd-ba7c-d19c39c363a1.mp3',
             './e382c0be-90e8-489c-8aa1-e61518ce971f.mp3',
-            './c6413c20-b45e-467a-ac7b-264cf2ed5bfa.mp3',
+            // './c6413c20-b45e-467a-ac7b-264cf2ed5bfa.mp3',
             './icons/icon_64.png',
             './icons/icon_180.png',
             './icons/icon_256.png',
