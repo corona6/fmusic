@@ -344,10 +344,10 @@
         const metaThemeColor = document.querySelector("meta[name=theme-color]");
 
         function updateNextButton() {
-            // nextBtn.innerHTML = [`focus`, `relax`][currentMode];
-            // document.body.style.filter = ["hue-rotate(0)", "hue-rotate(80deg)"][currentMode];
-            nextBtn.innerHTML = [`focus`, `relax`, `drive`][currentMode];
-            document.body.style.filter = ["hue-rotate(0)", "hue-rotate(80deg)", "hue-rotate(180deg)"][currentMode];
+            nextBtn.innerHTML = [`focus`, `relax`][currentMode];
+            document.body.style.filter = ["hue-rotate(0)", "hue-rotate(80deg)"][currentMode];
+            // nextBtn.innerHTML = [`focus`, `relax`, `drive`][currentMode];
+            // document.body.style.filter = ["hue-rotate(0)", "hue-rotate(80deg)", "hue-rotate(180deg)"][currentMode];
             if (currentMode !== 1) {
                 boxContainer.style.display = "block";
                 breathingContainer.style.display = "none";
@@ -358,10 +358,10 @@
         }
 
         nextBtn.onclick = () => {
-            // currentMode = (currentMode + 1) % 2;
-            // audioElement.src = ["17c6eaa2-e8a0-4dbd-ba7c-d19c39c363a1.mp3", "e382c0be-90e8-489c-8aa1-e61518ce971f.mp3"][currentMode];
-            currentMode = (currentMode + 1) % 3;
-            audioElement.src = ["081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3", "e382c0be-90e8-489c-8aa1-e61518ce971f.mp3", "17c6eaa2-e8a0-4dbd-ba7c-d19c39c363a1.mp3"][currentMode];
+            currentMode = (currentMode + 1) % 2;
+            audioElement.src = ["081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3", "e382c0be-90e8-489c-8aa1-e61518ce971f.mp3"][currentMode];
+            // currentMode = (currentMode + 1) % 3;
+            // audioElement.src = ["081a2a07-7c5b-4c2f-a883-bcbd9c548a02.mp3", "e382c0be-90e8-489c-8aa1-e61518ce971f.mp3", "17c6eaa2-e8a0-4dbd-ba7c-d19c39c363a1.mp3"][currentMode];
             if (isTimer) {
                 clearInterval(timer1);
                 clearTimeout(timeoutID);
