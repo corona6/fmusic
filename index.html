@@ -267,6 +267,16 @@
         .marker:nth-child(1) { transform: translateX(-50%) rotate(0deg); }
         .marker:nth-child(2) { transform: translateX(-50%) rotate(90deg); }
         .marker:nth-child(3) { transform: translateX(-50%) rotate(180deg); }
+
+        .timer-text-overlay {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            -webkit-transform: translateX(-50%);
+            padding: .5em;
+            color: rgba(255, 255, 255, 0.35);
+        }
     </style>
 </head>
 
@@ -296,6 +306,7 @@
     </div>
 
     <div id="boxb" class="overlay">
+        <div id="timer-text-overlay" class="timer-text-overlay"></div>
         <div id="box-breathing-container">
             <div id="box-container">
                 <div id="box"></div>
@@ -337,6 +348,7 @@
         const timer5Btn = document.getElementById('timer-5-btn');
         const timer15Btn = document.getElementById('timer-15-btn');
         const timerText = document.getElementById('timer-text');
+        const timerTextOverlay = document.getElementById('timer-text-overlay');
         const audioElement = document.querySelector("audio");
         const overlayb = document.getElementById('overlayb');
         const boxContainer = document.getElementById('box-container');
@@ -374,6 +386,7 @@
                 if (timerM <= 0) {
                     isTimer = false;
                     timerText.textContent = "∞";
+                    timerTextOverlay.textContent = "";
                     clearInterval(timer1);
                     clearTimeout(timeoutID);
                 } else {
@@ -395,6 +408,7 @@
         timerIBtn.onclick = () => {
             isTimer = false;
             timerText.textContent = "∞";
+            timerTextOverlay.textContent = "";
             timerM = 0;
             clearInterval(timer1);
             clearTimeout(timeoutID);
@@ -462,6 +476,7 @@
             if (timerM > 0) timerM -= 1;
             if (timerM <= 0) clearInterval(timer1);
             timerText.textContent = toTime(timerM);
+            timerTextOverlay.textContent = toTime(timerM);
         }
 
         function toTime(seconds) {
