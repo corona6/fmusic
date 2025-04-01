@@ -116,6 +116,10 @@
             border: .75px #fff solid;
         }
 
+        .overlay-button.odot {
+            right: 70px;
+        }
+
         .overlay {
             height: 100%;
             width: 100%;
@@ -125,6 +129,39 @@
             top: 0;
             left: 0;
             background-color: rgb(0, 0, 0);
+        }
+
+        .overlay.ovdot {
+            background-color: #fff;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #focus-point {
+            width: .75rem;
+            height: .75rem;
+            background-color: #000;
+            border-radius: 50%;
+            animation: an 10.3s cubic-bezier(0.12, 0, 0.39, 0) infinite, an2 8.7s ease-in-out infinite;
+        }
+
+        @keyframes an {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.3);
+            }
+        }
+
+        @keyframes an2 {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
         }
 
         #box-breathing-container {
@@ -321,6 +358,14 @@
             </div>
         </div>
     </div>
+    <div id="dotb" class="overlay ovdot">
+        <div id="focus-point"></div>
+    </div>
+    <button id="overlaybd" class="overlay-button odot">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dot" viewBox="0 0 16 16">
+            <path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
+        </svg>
+    </button>
     <button id="overlayb" class="overlay-button">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wind" viewBox="0 0 16 16">
             <path d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5"/>
@@ -343,6 +388,7 @@
         let timer1;
         let timerM = 0;
         let wakeLock = null;
+        let timeoutDot;
         const nextBtn = document.getElementById('next-btn');
         const timerIBtn = document.getElementById('timer-i-btn');
         const timer5Btn = document.getElementById('timer-5-btn');
@@ -351,6 +397,7 @@
         const timerTextOverlay = document.getElementById('timer-text-overlay');
         const audioElement = document.querySelector("audio");
         const overlayb = document.getElementById('overlayb');
+        const overlaybd = document.getElementById('overlaybd');
         const boxContainer = document.getElementById('box-container');
         const breathingContainer = document.getElementById('breathing-container');
         const metaThemeColor = document.querySelector("meta[name=theme-color]");
@@ -442,6 +489,7 @@
             isOverlay = !isOverlay;
             if (isOverlay) {
                 overlayb.classList.add("on");
+                overlaybd.style.display = "none";
                 document.getElementById("boxb").style.display = "block";
                 metaThemeColor.setAttribute('content', "#000000");
                 overlayb.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
@@ -460,8 +508,11 @@
                     });
                 }, 1000 * 60 * 16);
             } else {
+                clearTimeout(timeoutDot);
                 overlayb.classList.remove("on");
+                overlaybd.style.display = "flex";
                 document.getElementById("boxb").style.display = "none";
+                document.getElementById("dotb").style.display = "none";
                 metaThemeColor.setAttribute('content', "#ffffff");
                 overlayb.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wind" viewBox="0 0 16 16">
   <path d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5"/>
@@ -470,6 +521,33 @@
                     wakeLock = null;
                 });
             }
+        };
+
+        overlaybd.onclick = () => {
+            isOverlay = !isOverlay;
+            overlaybd.style.display = "none";
+            document.getElementById("dotb").style.display = "flex";
+            overlayb.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+<path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+</svg>`;
+            const requestWakeLock = async () => {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                } catch (err) {
+                }
+            };
+            requestWakeLock();
+            timeoutDot = window.setTimeout(() => {
+                wakeLock.release().then(() => {
+                    wakeLock = null;
+                });
+                isOverlay = !isOverlay;
+                overlaybd.style.display = "flex";
+                document.getElementById("dotb").style.display = "none";
+                overlayb.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wind" viewBox="0 0 16 16">
+  <path d="M12.5 2A2.5 2.5 0 0 0 10 4.5a.5.5 0 0 1-1 0A3.5 3.5 0 1 1 12.5 8H.5a.5.5 0 0 1 0-1h12a2.5 2.5 0 0 0 0-5m-7 1a1 1 0 0 0-1 1 .5.5 0 0 1-1 0 2 2 0 1 1 2 2h-5a.5.5 0 0 1 0-1h5a1 1 0 0 0 0-2M0 9.5A.5.5 0 0 1 .5 9h10.042a3 3 0 1 1-3 3 .5.5 0 0 1 1 0 2 2 0 1 0 2-2H.5a.5.5 0 0 1-.5-.5"/>
+</svg>`;
+            }, 1000 * 60 * 1);
         };
 
         function updateTimer() {
